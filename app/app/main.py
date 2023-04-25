@@ -26,7 +26,7 @@ app.add_middleware(
 
 @app.get("/")
 def get_api_status():
-    return {"status": f"running at {URL_PREFIX}"}
+    return {"status": f"running via automated deployment at {URL_PREFIX}"}
 
 
 @app.get(URL_PREFIX + "/foo/")
