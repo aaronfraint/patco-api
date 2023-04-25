@@ -15,5 +15,5 @@ jobs:
       - name: Push to dokku
         uses: dokku/github-action@master
         with:
-          git_remote_url: "ssh://dokku@patco-api.137.184.219.86"
+          git_remote_url: "ssh://dokku@137.184.219.86/patco-api"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
