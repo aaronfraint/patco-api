@@ -5,7 +5,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import sql_query_raw
-
+from .utils import get_current_time_est
 
 load_dotenv(find_dotenv())
 
@@ -26,7 +26,10 @@ app.add_middleware(
 
 @app.get("/")
 def get_api_status():
-    return {"status": f"running via automated deployment at {URL_PREFIX}"}
+    return {
+        "status": f"running via automated deployment at {URL_PREFIX}",
+        "current_time": get_current_time_est(),
+    }
 
 
 @app.get(URL_PREFIX + "/foo/")
