@@ -1,1 +1,5 @@
 black
+requests
+pandas
+sqlalchemy
+psycopg2
