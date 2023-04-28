@@ -1,7 +1,12 @@
 import asyncpg
+import os
+from dotenv import find_dotenv, load_dotenv
 
+load_dotenv(find_dotenv())
 
-async def sql_query_raw(query: str, uri: str):
+DATABASE_URL = os.getenv("DATABASE_URL", None)
+
+async def sql_query_raw(query: str, uri: str = DATABASE_URL):
     """
     Connect to postgres via `asyncpg` and return raw result of query
     """
