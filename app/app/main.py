@@ -34,6 +34,10 @@ def get_api_status():
 
 @app.get(URL_PREFIX + "/active-service-id/")
 async def active_service_id():
+    """
+        Get the service id for the current day.
+        Each of [Weekday, Saturday, Sunday] has its own ID.
+    """
     now = get_current_time_est()
     today = str(now.date()).replace("-", "")
     day_of_week = get_day_of_week()
@@ -55,8 +59,3 @@ async def active_service_id():
     for entry in results:
         if entry["day_of_week"] == day_of_week:
             return {**entry, "time": now}
-
-
-@app.get(URL_PREFIX + "/foo/")
-async def test_function():
-    return {"foo": "bar"}
