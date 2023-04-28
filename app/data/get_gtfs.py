@@ -28,7 +28,11 @@ def import_single_csv_to_postgres(data_path: Path):
     """Import a single CSV file to Postgres"""
     print(data_path)
     df = pd.read_csv(data_path)
-    df.to_sql(data_path.stem, con=create_engine(DATABASE_URL))
+    df.to_sql(
+        data_path.stem,
+        con=create_engine(DATABASE_URL),
+        if_exists="replace",
+    )
 
 
 def import_all_csvs_to_posgres():
