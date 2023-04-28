@@ -35,8 +35,8 @@ def get_api_status():
 @app.get(URL_PREFIX + "/active-service-id/")
 async def active_service_id():
     """
-        Get the service id for the current day.
-        Each of [Weekday, Saturday, Sunday] has its own ID.
+    Get the service id for the current day.
+    Each of [Weekday, Saturday, Sunday] has its own ID.
     """
     now = get_current_time_est()
     today = str(now.date()).replace("-", "")
@@ -52,7 +52,6 @@ async def active_service_id():
         FROM calendar
         WHERE end_date >= {today}    
     """
-    print(active_service_query)
 
     results = await sql_query_raw(active_service_query, DATABASE_URL)
 
