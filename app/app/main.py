@@ -6,10 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import sql_query_raw
 from .utils import get_current_time_est, get_day_of_week
+from .queries import get_name_of_stop
 
 load_dotenv(find_dotenv())
 
-DATABASE_URL = os.getenv("DATABASE_URL", None)
 URL_PREFIX = os.getenv("URL_PREFIX", "/api/v0")
 
 app = FastAPI(docs_url=URL_PREFIX)
@@ -53,8 +53,37 @@ async def active_service_id():
         WHERE end_date >= {today}    
     """
 
-    results = await sql_query_raw(active_service_query, DATABASE_URL)
+    results = await sql_query_raw(active_service_query)
 
     for entry in results:
         if entry["day_of_week"] == day_of_week:
             return {**entry, "time": now}
+
+
+@app.get(URL_PREFIX + "/station/")
+async def stop_times_for_station(stop_id: int, headsign: str):
+    headsign_options = ["Philadelphia", "Lindenwold"]
+    if headsign not in headsign_options:
+        return {"message": f"Headsign parameter must be one of: {headsign_options}"}
+
+    query = f"""
+        select arrival_time 
+        from stop_times
+        where trip_id in (
+            select trip_id
+            from trips
+            where service_id = 78
+            and trip_headsign = 'Philadelphia'
+        )
+        and stop_id = {stop_id}
+        order by arrival_time 
+    """
+
+    result = await sql_query_raw(query)
+    stop_data = await get_name_of_stop(stop_id)
+
+    return {
+        "at_stop": stop_data[0],
+        "heading_towards": headsign,
+        "arrival_times": [x["arrival_time"] for x in result],
+    }
