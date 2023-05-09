@@ -60,30 +60,58 @@ async def active_service_id():
             return {**entry, "time": now}
 
 
-@app.get(URL_PREFIX + "/station/")
-async def stop_times_for_station(stop_id: int, headsign: str):
-    headsign_options = ["Philadelphia", "Lindenwold"]
-    if headsign not in headsign_options:
-        return {"message": f"Headsign parameter must be one of: {headsign_options}"}
-
+async def get_times(
+    station_name: str,
+    tablename: str,
+    time: str,
+):
+    """
+    Tablename encapsulates the day of week and direction
+    Station name should be a sanitized, valid name of a PATCO station
+    Time can be any current, past, or future time formatted as HH:MM:SS
+    """
     query = f"""
-        select arrival_time 
-        from stop_times
-        where trip_id in (
-            select trip_id
-            from trips
-            where service_id = 78
-            and trip_headsign = 'Philadelphia'
+        with _data as (
+            select station_{station_name} as value
+            from {tablename}
+            where station_{station_name} != 'Does not stop'          
         )
-        and stop_id = {stop_id}
-        order by arrival_time 
+        select value
+        from _data
+        where value::time >= '{time}'::time;
     """
 
     result = await sql_query_raw(query)
-    stop_data = await get_name_of_stop(stop_id)
+
+    return [x["value"] for x in result]
+
+
+@app.get(URL_PREFIX + "/timetable/")
+async def timetable_for_station(station_name: str, direction: str = "wb"):
+    names = [
+        "15_16th_and_locust",
+        "12_13th_and_locust",
+        "9_10th_and_locust",
+        "8th_and_market",
+        "city_hall",
+        "broadway",
+        "ferry_ave",
+        "collingswood",
+        "westmont",
+        "haddonfield",
+        "woodcrest",
+        "ashland",
+        "lindenwold",
+    ]
+    if station_name not in names:
+        return {"message": f"Station Name parameter must be one of: {names}"}
+
+    current_time = get_current_time_est().time()
+    tablename = f"timetable_{get_day_of_week()}_{direction}"
+
+    times = await get_times(station_name, tablename, current_time)
 
     return {
-        "at_stop": stop_data[0],
-        "heading_towards": headsign,
-        "arrival_times": [x["arrival_time"] for x in result],
+        "source_table": tablename,
+        "upcoming_times": times,
     }
