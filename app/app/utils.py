@@ -9,8 +9,8 @@ def get_current_time_est():
 def get_day_of_week():
     now = get_current_time_est().weekday()
     if now < 5:
-        return "Weekday"
+        return "weekday"
     elif now == 5:
-        return "Satuday"
+        return "satuday"
     elif now == 6:
-        return "Sunday"
+        return "sunday"
