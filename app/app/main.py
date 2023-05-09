@@ -113,6 +113,7 @@ async def timetable_for_station(station_name: str, direction: str = "wb"):
 
     return {
         "source_table": tablename,
+        "for_station": station_name,
         "times_after": current_time,
         "upcoming_times": times,
     }
