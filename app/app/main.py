@@ -76,14 +76,16 @@ async def get_times(
             from {tablename}
             where station_{station_name} != 'Does not stop'          
         )
-        select value
+        select
+            value,
+            value, value::time - '{time}'::time as seconds_away
         from _data
         where value::time >= '{time}'::time;
     """
 
     result = await sql_query_raw(query)
 
-    return [x["value"] for x in result]
+    return [[x["value"], x["seconds_away"]] for x in result]
 
 
 @app.get(URL_PREFIX + "/timetable/")
