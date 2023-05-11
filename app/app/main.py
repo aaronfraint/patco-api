@@ -1,13 +1,13 @@
 import os
 from dotenv import find_dotenv, load_dotenv
+from enum import Enum
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import sql_query_raw
-from .utils import get_current_time_est, get_day_of_week, is_station_name
-from .queries import get_name_of_stop
-from .constants import STATION_NAMES
+from .utils import get_current_time_est, get_day_of_week
+
 
 load_dotenv(find_dotenv())
 
@@ -23,6 +23,32 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+
+class Direction(str, Enum):
+    eb = "eb"
+    wb = "wb"
+
+
+class Station(str, Enum):
+    x15_16th_and_locust = "15_16th_and_locust"
+    x12_13th_and_locust = "12_13th_and_locust"
+    x9_10th_and_locust = "9_10th_and_locust"
+    x8th_and_market = "8th_and_market"
+    city_hall = "city_hall"
+    broadway = "broadway"
+    ferry_ave = "ferry_ave"
+    collingswood = "collingswood"
+    westmont = "westmont"
+    haddonfield = "haddonfield"
+    woodcrest = "woodcrest"
+    ashland = "ashland"
+    lindenwold = "lindenwold"
+
+
+class RouteEndpoint(str, Enum):
+    arrive = "arrive"
+    depart = "depart"
 
 
 @app.get("/")
@@ -116,10 +142,6 @@ async def get_times_for_two_stations(
             order by origin_station::time asc
             limit {limit}
         """
-    else:
-        return {
-            "message": "Paramtere 'arrive_or_depart' must either be 'arrive' or 'depart'"
-        }
 
     query = f"""
         with _data as (
@@ -145,10 +167,7 @@ async def get_times_for_two_stations(
 
 
 @app.get(URL_PREFIX + "/timetable/")
-async def timetable_for_station(station_name: str, direction: str = "wb"):
-    if not is_station_name(station_name):
-        return {"message": f"Station Name parameter must be one of: {STATION_NAMES}"}
-
+async def timetable_for_station(station_name: Station, direction: Direction):
     current_time = get_current_time_est().time()
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
@@ -164,22 +183,14 @@ async def timetable_for_station(station_name: str, direction: str = "wb"):
 
 @app.get(URL_PREFIX + "/trip-options/")
 async def trip_options(
-    origin_station_name: str,
-    destination_station_name: str,
+    origin_station_name: Station,
+    destination_station_name: Station,
     time: str,
-    arrive_or_depart: str,
-    direction: str = "wb",
+    arrive_or_depart: RouteEndpoint,
+    direction: Direction,
     limit: int = 10,
 ):
-    # Confirm that valid station names have been provided
-    if not is_station_name(origin_station_name):
-        return {
-            "message": f"Origin Station Name parameter must be one of: {STATION_NAMES}"
-        }
-    if not is_station_name(destination_station_name):
-        return {
-            "message": f"Destination Station Name parameter must be one of: {STATION_NAMES}"
-        }
+    # TODO: figure out the `direction` within the code, based on start and end stations
 
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
