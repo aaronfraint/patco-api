@@ -60,11 +60,15 @@ def handle_value(val: str) -> str:
         return "Does not stop"
 
     try:
-        val_without_ampm = val.split(" ")[0]
+        val_without_ampm = val
+        for char in [" ", "A", "P"]:
+            val_without_ampm = val_without_ampm.replace(char, "")
+
         hour, minute = val_without_ampm.split(":")
 
     except:
         print(val)
+
     if "A" in val:
         if "12:" in val:
             hour = 0
