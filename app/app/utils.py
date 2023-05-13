@@ -11,6 +11,6 @@ def get_day_of_week():
     if now < 5:
         return "weekday"
     elif now == 5:
-        return "satuday"
+        return "saturday"
     elif now == 6:
         return "sunday"
