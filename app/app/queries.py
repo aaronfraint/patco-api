@@ -8,7 +8,6 @@ async def get_times_for_single_station(
 ):
     """
     Tablename encapsulates the day of week and direction
-    Station name should be a sanitized, valid name of a PATCO station
     Time can be any current, past, or future time formatted as HH:MM:SS
     """
     query = f"""
@@ -37,7 +36,6 @@ async def get_times_for_two_stations(
 ):
     """
     Tablename encapsulates the day of week and direction
-    Station name should be a sanitized, valid name of a PATCO station
     Time can be any current, past, or future time formatted as HH:MM:SS
     """
 
