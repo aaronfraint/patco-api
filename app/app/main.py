@@ -5,7 +5,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import sql_query_raw
-from .utils import get_current_time_est, get_day_of_week
+from .utils import get_current_time_est, get_day_of_week, what_direction_is_this
 from .queries import get_times_for_single_station, get_times_for_two_stations
 from .options import Direction, Station, RouteEndpoint
 
@@ -57,10 +57,9 @@ async def trip_options(
     destination_station_name: Station,
     time: str,
     arrive_or_depart: RouteEndpoint,
-    direction: Direction,
     limit: int = 10,
 ):
-    # TODO: figure out the `direction` within the code, based on start and end stations
+    direction = what_direction_is_this(origin_station_name, destination_station_name)
 
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
@@ -77,6 +76,7 @@ async def trip_options(
         "source_table": tablename,
         "origin": origin_station_name,
         "destination": destination_station_name,
+        "direction": direction,
         "arrive_or_depart": arrive_or_depart,
         "time": time,
         "upcoming_times": times,
