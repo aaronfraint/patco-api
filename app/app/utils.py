@@ -1,5 +1,6 @@
 from datetime import datetime
 from pytz import timezone
+from .options import STATIONS_EB
 
 
 def get_current_time_est():
@@ -14,3 +15,13 @@ def get_day_of_week():
         return "saturday"
     elif now == 6:
         return "sunday"
+
+
+def what_direction_is_this(start_station: str, end_station: str) -> str:
+    start_index = STATIONS_EB.index(start_station)
+    end_index = STATIONS_EB.index(end_station)
+
+    if start_index < end_index:
+        return "eb"
+    else:
+        return "wb"
