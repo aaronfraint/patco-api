@@ -43,5 +43,11 @@ def import_all_csvs_to_posgres():
         import_single_csv_to_postgres(csv_path)
 
 
+def clean_up_sql_tables():
+    # TODO
+    pass
+
+
 if __name__ == "__main__":
     import_all_csvs_to_posgres()
+    clean_up_sql_tables()

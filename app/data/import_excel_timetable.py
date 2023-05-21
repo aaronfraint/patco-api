@@ -149,5 +149,11 @@ def publish_to_postgres():
         )
 
 
+def clean_up_sql_tables():
+    # TODO
+    pass
+
+
 if __name__ == "__main__":
     publish_to_postgres()
+    clean_up_sql_tables()
