@@ -1,7 +1,4 @@
-from .database import sql_query_raw
-
-
-async def get_times_for_single_station(
+def GET_TIMES_FOR_SINGLE_STATION(
     station_name: str,
     tablename: str,
     time: str,
@@ -10,23 +7,26 @@ async def get_times_for_single_station(
     Tablename encapsulates the day of week and direction
     Time can be any current, past, or future time formatted as HH:MM:SS
     """
-    query = f"""
-        with _data as (
-            select station_{station_name} as value
-            from {tablename}
-            where station_{station_name} != 'Does not stop'          
-        )
+    return f"""
+    with _data as (
         select
-            value as stop_time,
-            value::time - '{time}'::time as seconds_away
-        from _data
-        where value::time >= '{time}'::time;
-    """
+            station_{station_name} as value
+        from
+            {tablename}
+        where
+            station_{station_name} != 'Does not stop'          
+    )
+    select
+        value as stop_time,
+        value::time - '{time}'::time as seconds_away
+    from
+        _data
+    where
+        value::time >= '{time}'::time;
+"""
 
-    return await sql_query_raw(query)
 
-
-async def get_times_for_two_stations(
+def GET_TIMES_FOR_TWO_STATIONS(
     origin_station_name: str,
     destination_station_name: str,
     tablename: str,
@@ -53,7 +53,7 @@ async def get_times_for_two_stations(
             limit {limit}
         """
 
-    query = f"""
+    return f"""
         with _data as (
             select
                 station_{origin_station_name} as origin_station,
@@ -71,7 +71,3 @@ async def get_times_for_two_stations(
         from _data
         {where_clause}
     """
-
-    print(query)
-
-    return await sql_query_raw(query)
