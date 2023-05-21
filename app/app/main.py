@@ -4,10 +4,13 @@ from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import sql_query_raw
-from .utils import get_current_time_est, get_day_of_week, what_direction_is_this
-from .queries import get_times_for_single_station, get_times_for_two_stations
 from .options import Direction, Station, RouteEndpoint
+from .database import sql_query_raw, postgis_query_to_geojson
+from .utils import get_current_time_est, get_day_of_week, what_direction_is_this
+
+from .queries.geoms import GET_STATION_GEOMS
+from .queries.timetable import GET_TIMES_FOR_SINGLE_STATION, GET_TIMES_FOR_TWO_STATIONS
+
 
 load_dotenv(find_dotenv())
 
@@ -33,6 +36,12 @@ def get_api_status():
     }
 
 
+@app.get(URL_PREFIX + "/station-geoms/")
+async def get_station_geoms():
+    query, columns = GET_STATION_GEOMS()
+    return await postgis_query_to_geojson(query, columns)
+
+
 @app.get(URL_PREFIX + "/timetable/")
 async def timetable_for_station(
     station_name: Station,
@@ -41,7 +50,9 @@ async def timetable_for_station(
     current_time = get_current_time_est().time()
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
-    times = await get_times_for_single_station(station_name, tablename, current_time)
+    query = GET_TIMES_FOR_SINGLE_STATION(station_name, tablename, current_time)
+
+    times = await sql_query_raw(query)
 
     return {
         "source_table": tablename,
@@ -63,7 +74,7 @@ async def trip_options(
 
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
-    times = await get_times_for_two_stations(
+    query = GET_TIMES_FOR_TWO_STATIONS(
         origin_station_name,
         destination_station_name,
         tablename,
@@ -71,6 +82,8 @@ async def trip_options(
         arrive_or_depart,
         limit,
     )
+
+    times = await sql_query_raw(query)
 
     return {
         "source_table": tablename,
