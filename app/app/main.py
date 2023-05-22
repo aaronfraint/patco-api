@@ -38,8 +38,8 @@ def get_api_status():
 
 @app.get(URL_PREFIX + "/station-geoms/")
 async def get_station_geoms():
-    query, columns = GET_STATION_GEOMS()
-    return await postgis_query_to_geojson(query, columns)
+    q = GET_STATION_GEOMS()
+    return await postgis_query_to_geojson(q.query, q.columns)
 
 
 @app.get(URL_PREFIX + "/timetable/")

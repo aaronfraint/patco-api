@@ -2,7 +2,7 @@ def GET_TIMES_FOR_SINGLE_STATION(
     station_name: str,
     tablename: str,
     time: str,
-):
+) -> str:
     """
     Tablename encapsulates the day of week and direction
     Time can be any current, past, or future time formatted as HH:MM:SS
@@ -33,7 +33,7 @@ def GET_TIMES_FOR_TWO_STATIONS(
     time: str,
     arrive_or_depart: str,
     limit: int,
-):
+) -> str:
     """
     Tablename encapsulates the day of week and direction
     Time can be any current, past, or future time formatted as HH:MM:SS
