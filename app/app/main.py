@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .options import Direction, Station, RouteEndpoint
 from .database import sql_query_raw, postgis_query_to_geojson
-from .utils import get_current_time_est, get_day_of_week, what_direction_is_this
+from .utils import get_current_time, get_day_of_week, what_direction_is_this
 
 from .queries.geoms import GET_STATION_GEOMS
 from .queries.timetable import GET_TIMES_FOR_SINGLE_STATION, GET_TIMES_FOR_TWO_STATIONS
@@ -32,7 +32,7 @@ app.add_middleware(
 def get_api_status():
     return {
         "status": f"running via automated deployment at {URL_PREFIX}",
-        "current_time": get_current_time_est(),
+        "current_time": get_current_time(),
     }
 
 
@@ -47,7 +47,7 @@ async def timetable_for_station(
     station_name: Station,
     direction: Direction,
 ):
-    current_time = get_current_time_est().time()
+    current_time = get_current_time()
     tablename = f"timetable_{get_day_of_week()}_{direction}"
 
     query = GET_TIMES_FOR_SINGLE_STATION(station_name, tablename, current_time)

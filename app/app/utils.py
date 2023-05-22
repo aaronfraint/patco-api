@@ -3,17 +3,21 @@ from pytz import timezone
 from .options import STATIONS_EB
 
 
-def get_current_time_est():
+def get_current_datetime_est():
     return datetime.now(timezone("US/Eastern"))
 
 
+def get_current_time():
+    return get_current_datetime_est().time()
+
+
 def get_day_of_week():
-    now = get_current_time_est().weekday()
-    if now < 5:
+    today = get_current_datetime_est().weekday()
+    if today < 5:
         return "weekday"
-    elif now == 5:
+    elif today == 5:
         return "saturday"
-    elif now == 6:
+    elif today == 6:
         return "sunday"
 
 
